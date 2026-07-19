@@ -1,0 +1,1363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TradeProfit Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal:#1C2126;
+    --charcoal-2:#262B32;
+    --charcoal-3:#31373F;
+    --paper:#F6F3EA;
+    --paper-2:#EDE8DA;
+    --blueprint:#2B4C7E;
+    --blueprint-light:#4A6FA5;
+    --orange:#E8590C;
+    --orange-light:#FF7A33;
+    --green:#2F7A4C;
+    --green-bg:#E4EFE7;
+    --red:#C4392B;
+    --red-bg:#F5E4E1;
+    --line:#D8D2C0;
+    --ink:#24211C;
+    --steel:#5B6470;
+    --amber-bg:#F3E9D2;
+    --amber:#93650F;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;padding:0;background:transparent;}
+  .app{
+    display:flex;
+    min-height:640px;
+    font-family:'Inter',sans-serif;
+    color:var(--ink);
+    background:var(--paper);
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,0.08);
+  }
+  /* ---------- SIDEBAR ---------- */
+  .sidebar{
+    width:210px;
+    flex-shrink:0;
+    background:var(--charcoal);
+    color:#EDEAE1;
+    display:flex;
+    flex-direction:column;
+    padding:20px 0 16px;
+  }
+  .brand{
+    padding:0 18px 18px;
+    border-bottom:1px dashed #454C55;
+    margin-bottom:10px;
+  }
+  .brand .tag{
+    font-family:'Oswald',sans-serif;
+    font-size:10px;
+    letter-spacing:2.5px;
+    color:var(--orange-light);
+    text-transform:uppercase;
+    margin-bottom:2px;
+  }
+  .brand .name{
+    font-family:'Oswald',sans-serif;
+    font-size:21px;
+    font-weight:600;
+    letter-spacing:0.5px;
+    line-height:1.15;
+  }
+  .nav{list-style:none;margin:0;padding:0;flex:1;}
+  .nav li{position:relative;}
+  .nav button{
+    all:unset;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+    padding:11px 18px;
+    font-family:'Inter',sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    color:#C7C2B4;
+    cursor:pointer;
+    border-left:3px solid transparent;
+    box-sizing:border-box;
+  }
+  .nav li.active button{
+    color:#fff;
+    background:var(--charcoal-2);
+    border-left:3px solid var(--orange);
+  }
+  .nav button:hover{color:#fff;}
+  .nav .ic{
+    width:18px;height:18px;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .nav .ic svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;}
+  .sidebar-foot{
+    padding:12px 18px 0;
+    border-top:1px dashed #454C55;
+    margin-top:10px;
+  }
+  .sidebar-foot button{
+    all:unset;cursor:pointer;font-size:11px;color:#8A8378;
+    font-family:'Inter',sans-serif;
+  }
+  .sidebar-foot button:hover{color:#C7C2B4;}
+
+  /* ---------- MAIN ---------- */
+  .content{flex:1;display:flex;flex-direction:column;min-width:0;background:
+    linear-gradient(var(--paper) 0 0),
+    repeating-linear-gradient(0deg, rgba(43,76,126,0.045) 0 1px, transparent 1px 34px),
+    repeating-linear-gradient(90deg, rgba(43,76,126,0.045) 0 1px, transparent 1px 34px);
+  }
+  .topbar{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 28px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .topbar h1{
+    font-family:'Oswald',sans-serif;
+    font-size:24px;font-weight:600;margin:0;letter-spacing:0.3px;
+    color:var(--ink);
+  }
+  .topbar .sub{font-size:12.5px;color:var(--steel);margin-top:2px;}
+  .view{padding:22px 28px 32px;overflow-y:auto;}
+
+  /* ---------- BUTTONS ---------- */
+  .btn{
+    all:unset;cursor:pointer;
+    font-family:'Inter',sans-serif;font-weight:600;font-size:13px;
+    padding:9px 16px;border-radius:6px;
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .btn-primary{background:var(--orange);color:#fff;}
+  .btn-primary:hover{background:var(--orange-light);}
+  .btn-dark{background:var(--charcoal);color:#fff;}
+  .btn-dark:hover{background:var(--charcoal-2);}
+  .btn-outline{background:transparent;color:var(--blueprint);border:1.5px solid var(--blueprint);}
+  .btn-outline:hover{background:var(--blueprint);color:#fff;}
+  .btn-ghost{background:transparent;color:var(--steel);padding:6px 10px;font-size:12.5px;}
+  .btn-ghost:hover{color:var(--red);}
+  .btn-sm{padding:6px 11px;font-size:12px;}
+  .btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+  /* ---------- CARDS / STATS ---------- */
+  .grid{display:grid;gap:14px;}
+  .grid-4{grid-template-columns:repeat(4,1fr);}
+  .grid-3{grid-template-columns:repeat(3,1fr);}
+  .grid-2{grid-template-columns:repeat(2,1fr);}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px 18px;
+  }
+  .stat{
+    background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:14px 16px;position:relative;overflow:hidden;
+  }
+  .stat::before{
+    content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blueprint);
+  }
+  .stat.orange::before{background:var(--orange);}
+  .stat.green::before{background:var(--green);}
+  .stat.steel::before{background:var(--steel);}
+  .stat .lbl{font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--steel);font-weight:600;margin-bottom:6px;}
+  .stat .val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--ink);}
+
+  h2.section-title{
+    font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;
+    text-transform:uppercase;letter-spacing:1px;color:var(--charcoal);
+    margin:26px 0 12px;padding-bottom:6px;border-bottom:1px solid var(--line);
+  }
+  h2.section-title:first-child{margin-top:0;}
+
+  /* ---------- TABLE ---------- */
+  table{width:100%;border-collapse:collapse;background:#fff;}
+  table.list{border:1px solid var(--line);border-radius:8px;overflow:hidden;}
+  th{
+    text-align:left;font-family:'Inter',sans-serif;font-size:10.5px;letter-spacing:1px;
+    text-transform:uppercase;color:var(--steel);font-weight:700;
+    padding:10px 12px;background:var(--paper-2);border-bottom:1px solid var(--line);
+  }
+  td{padding:9px 12px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  tr.clickable:hover{background:var(--paper-2);cursor:pointer;}
+  td.num, th.num{text-align:right;font-family:'JetBrains Mono',monospace;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+
+  .badge{
+    display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:0.5px;
+    padding:3px 9px;border-radius:20px;text-transform:uppercase;
+  }
+  .badge.estimate{background:var(--amber-bg);color:var(--amber);}
+  .badge.active{background:#E1EAF3;color:var(--blueprint);}
+  .badge.invoiced{background:#EDE3F5;color:#6B3FA0;}
+  .badge.complete{background:var(--green-bg);color:var(--green);}
+  .badge.paid{background:var(--green-bg);color:var(--green);}
+  .badge.sent{background:#E1EAF3;color:var(--blueprint);}
+  .badge.unsent{background:var(--paper-2);color:var(--steel);}
+  .badge.pending{background:var(--amber-bg);color:var(--amber);}
+  .badge.approved{background:var(--green-bg);color:var(--green);}
+
+  .profit-pos{color:var(--green);font-weight:700;}
+  .profit-neg{color:var(--red);font-weight:700;}
+
+  .empty{
+    text-align:center;padding:40px 20px;color:var(--steel);font-size:13.5px;
+    border:1.5px dashed var(--line);border-radius:8px;background:#fff;
+  }
+  .empty b{display:block;color:var(--ink);font-family:'Oswald',sans-serif;font-size:15px;margin-bottom:4px;}
+
+  /* ---------- FORMS ---------- */
+  label{display:block;font-size:11px;font-weight:700;color:var(--steel);letter-spacing:0.4px;text-transform:uppercase;margin-bottom:4px;}
+  input,select,textarea{
+    width:100%;font-family:'Inter',sans-serif;font-size:13.5px;padding:8px 10px;
+    border:1.5px solid var(--line);border-radius:6px;background:#fff;color:var(--ink);
+  }
+  input.mono-input{font-family:'JetBrains Mono',monospace;}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blueprint);}
+  .field{margin-bottom:12px;}
+  .row{display:flex;gap:10px;}
+  .row > .field{flex:1;min-width:0;}
+  .inline-table input,.inline-table select{padding:6px 8px;font-size:13px;}
+  .add-row-form{
+    display:flex;gap:8px;align-items:flex-end;padding:12px;background:var(--paper-2);
+    border-top:1px solid var(--line);flex-wrap:wrap;
+  }
+  .add-row-form .field{margin-bottom:0;min-width:90px;flex:1;}
+
+  /* ---------- MODAL ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(20,20,20,0.55);
+    display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;
+  }
+  .modal{
+    background:var(--paper);border-radius:10px;max-width:520px;width:100%;
+    max-height:86vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.3);
+  }
+  .modal-head{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:16px 20px;border-bottom:1px solid var(--line);
+  }
+  .modal-head h3{font-family:'Oswald',sans-serif;font-size:17px;margin:0;}
+  .modal-close{all:unset;cursor:pointer;font-size:20px;color:var(--steel);line-height:1;padding:4px;}
+  .modal-body{padding:18px 20px;}
+  .modal-foot{padding:14px 20px;border-top:1px solid var(--line);display:flex;justify-content:flex-end;gap:8px;}
+
+  /* ---------- JOB DETAIL ---------- */
+  .job-head{
+    background:#fff;border:1px solid var(--line);border-radius:8px;padding:16px 18px;
+    display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin-bottom:16px;
+  }
+  .job-head h2{font-family:'Oswald',sans-serif;font-size:20px;margin:0 0 4px;}
+  .job-head .cust{font-size:13px;color:var(--steel);}
+  .subnav{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+  .subnav button{
+    all:unset;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600;font-size:12.5px;
+    padding:8px 14px;border-radius:20px;background:#fff;border:1.5px solid var(--line);color:var(--steel);
+  }
+  .subnav button.active{background:var(--charcoal);color:#fff;border-color:var(--charcoal);}
+
+  .totals-strip{display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;}
+  .totals-strip .t{
+    background:var(--paper-2);border-radius:6px;padding:8px 14px;font-size:12.5px;color:var(--steel);
+  }
+  .totals-strip .t b{display:block;font-family:'JetBrains Mono',monospace;font-size:16px;color:var(--ink);font-weight:700;}
+
+  .invoice-sheet{
+    background:#fff;border:1px solid var(--line);border-radius:8px;padding:30px;
+    max-width:680px;
+  }
+  .invoice-sheet .inv-top{display:flex;justify-content:space-between;border-bottom:2px solid var(--charcoal);padding-bottom:14px;margin-bottom:16px;}
+  .invoice-sheet .inv-top h2{font-family:'Oswald',sans-serif;font-size:26px;margin:0;letter-spacing:1px;}
+  .invoice-sheet table td, .invoice-sheet table th{padding:8px 4px;}
+  .invoice-sheet .grand{font-size:19px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
+  ::-webkit-scrollbar{width:9px;height:9px;}
+  ::-webkit-scrollbar-thumb{background:#C9C2AF;border-radius:5px;}
+  @media print{
+    .no-print{display:none !important;}
+  }
+
+  /* ---------- RESPONSIVE ---------- */
+  .table-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  @media (max-width: 780px){
+    body{min-height:100vh;}
+    .app{
+      flex-direction:column;
+      min-height:100vh;
+      border-radius:0;
+    }
+    .sidebar{
+      width:100%;
+      flex-direction:row;
+      align-items:center;
+      padding:12px 12px;
+      gap:10px;
+      position:sticky;top:0;z-index:20;
+    }
+    .brand{border-bottom:none;margin-bottom:0;padding:0;flex-shrink:0;}
+    .brand .name{font-size:16px;line-height:1.1;}
+    .brand .tag{display:none;}
+    .nav{display:flex;flex:1;overflow-x:auto;gap:2px;-webkit-overflow-scrolling:touch;}
+    .nav li{flex-shrink:0;}
+    .nav button{
+      flex-direction:column;gap:3px;padding:8px 10px;
+      border-left:none;border-bottom:3px solid transparent;
+      font-size:10px;white-space:nowrap;
+    }
+    .nav li.active button{border-left:none;border-bottom:3px solid var(--orange);}
+    .nav .ic svg{width:18px;height:18px;}
+    .sidebar-foot{display:none;}
+
+    .topbar{padding:14px 14px 10px;flex-wrap:wrap;gap:10px;}
+    .topbar h1{font-size:19px;}
+    .topbar #topAction{width:100%;}
+    .topbar #topAction .btn{width:100%;justify-content:center;}
+
+    .view{padding:14px 14px 28px;}
+
+    .grid-4, .grid-3, .grid-2{grid-template-columns:1fr 1fr;}
+    .stat .val{font-size:18px;}
+
+    .row{flex-direction:column;gap:0;}
+    .add-row-form{flex-direction:column;align-items:stretch;}
+    .add-row-form .field{min-width:0;}
+    .add-row-form .btn{width:100%;justify-content:center;margin-top:4px;}
+
+    .job-head{flex-direction:column;align-items:stretch;}
+    .job-head h2{font-size:18px;}
+    .subnav{overflow-x:auto;flex-wrap:nowrap;padding-bottom:4px;}
+    .subnav button{flex-shrink:0;}
+
+    .modal{max-height:92vh;}
+    .invoice-sheet{padding:18px;}
+
+    .totals-strip{gap:8px;}
+    .totals-strip .t{flex:1 1 45%;}
+
+    /* Data-entry tables (Estimate, Materials, Change Orders) become stacked
+       cards on mobile instead of horizontally-scrolling tables — each row
+       becomes a card, each cell becomes a labeled field, full width, easy
+       to tap with a thumb on a job site. */
+    .table-wrap:has(.inline-table){overflow-x:visible;}
+    .inline-table{min-width:0;width:100%;}
+    .inline-table thead, .inline-table tr:has(th){display:none;}
+    .inline-table tr{
+      display:block;background:#fff;border:1px solid var(--line);
+      border-radius:10px;padding:12px 14px;margin-bottom:10px;position:relative;
+    }
+    .inline-table tr:has(td[colspan]){border-style:dashed;}
+    .inline-table td{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      border-bottom:none;padding:7px 0;font-size:13.5px;
+    }
+    .inline-table td[data-label]::before{
+      content:attr(data-label);
+      font-size:10.5px;font-weight:700;color:var(--steel);
+      text-transform:uppercase;letter-spacing:0.4px;flex:0 0 auto;
+    }
+    .inline-table td input, .inline-table td select{
+      flex:1 1 auto;max-width:62%;text-align:right;
+    }
+    .inline-table td[data-label="Description"],
+    .inline-table td[data-label="Material"]{
+      flex-direction:column;align-items:stretch;gap:4px;
+    }
+    .inline-table td[data-label="Description"] input,
+    .inline-table td[data-label="Material"] input{
+      max-width:100%;text-align:left;font-weight:600;
+    }
+    .inline-table td.num{font-weight:700;}
+    .inline-table td.del-cell{
+      position:absolute;top:8px;right:8px;padding:0;justify-content:flex-end;
+    }
+    .inline-table td[colspan]{display:block;text-align:center;}
+  }
+  @media (max-width: 420px){
+    .grid-4, .grid-3, .grid-2{grid-template-columns:1fr;}
+  }
+
+  /* ================= POLISH LAYER ================= */
+
+  /* smoother base feel */
+  body{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;}
+  .app{box-shadow:0 4px 24px rgba(0,0,0,0.10), 0 1px 3px rgba(0,0,0,0.06);}
+
+  /* buttons: tactile hover/press, no more instant snap */
+  .btn{transition:background-color .16s ease, color .16s ease, transform .1s ease, box-shadow .16s ease;}
+  .btn-primary{box-shadow:0 1px 2px rgba(232,89,12,0.25);}
+  .btn-primary:hover{box-shadow:0 3px 10px rgba(232,89,12,0.32);transform:translateY(-1px);}
+  .btn-primary:active{transform:translateY(0);box-shadow:0 1px 2px rgba(232,89,12,0.25);}
+  .btn-dark:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,0.22);}
+  .btn-dark:active{transform:translateY(0);}
+  .btn-outline{transition:background-color .16s ease, color .16s ease, transform .1s ease;}
+  .btn-outline:hover{transform:translateY(-1px);}
+  .btn-ghost{transition:color .14s ease, background-color .14s ease;border-radius:5px;}
+  .btn-ghost:hover{background:rgba(91,100,112,0.09);}
+
+  /* nav: smoother active state transitions */
+  .nav button{transition:color .15s ease, background-color .15s ease, border-color .15s ease;}
+  .nav li.active button{box-shadow:inset 0 0 0 0 transparent;}
+
+  /* cards & stats: subtle lift, soft shadow instead of flat border-only */
+  .card, .stat, table.list, .job-head, .invoice-sheet{
+    box-shadow:0 1px 2px rgba(20,20,15,0.04);
+    transition:box-shadow .18s ease, transform .18s ease;
+  }
+  .stat:hover{box-shadow:0 4px 14px rgba(20,20,15,0.08);transform:translateY(-1px);}
+  tr.clickable{transition:background-color .12s ease;}
+
+  /* subnav pills: smoother state change */
+  .subnav button{transition:background-color .15s ease, color .15s ease, border-color .15s ease;}
+
+  /* inputs: refined focus ring instead of hard color snap */
+  input,select,textarea{transition:border-color .14s ease, box-shadow .14s ease;}
+  input:focus,select:focus,textarea:focus{box-shadow:0 0 0 3px rgba(43,76,126,0.14);}
+
+  /* badges: soft depth */
+  .badge{box-shadow:0 1px 2px rgba(0,0,0,0.05);}
+
+  /* modal: fade + gentle rise instead of appearing instantly */
+  .modal-backdrop{animation:fadeIn .16s ease;}
+  .modal{animation:modalRise .2s cubic-bezier(.2,.8,.3,1);}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  @keyframes modalRise{from{opacity:0;transform:translateY(10px) scale(.98);}to{opacity:1;transform:translateY(0) scale(1);}}
+
+  /* view switch: soft fade instead of an instant hard cut */
+  .view{animation:viewFade .18s ease;}
+  @keyframes viewFade{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+
+  /* empty states: a touch more presence */
+  .empty{transition:box-shadow .18s ease;}
+  .empty:hover{box-shadow:0 2px 10px rgba(20,20,15,0.05);}
+
+  /* sidebar nav icon: subtle scale on active for a bit of life */
+  .nav li.active .ic svg{transform:scale(1.05);transition:transform .15s ease;}
+
+  /* scrollbar polish (webkit) already present — refine hover state */
+  ::-webkit-scrollbar-thumb:hover{background:#B8AF98;}
+
+  /* reduce motion for anyone who prefers it */
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important;transition-duration:0.001ms !important;}
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app"></div>
+
+<script>(function(){
+const ICONS = {
+dashboard: '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>',
+customers: '<svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.5" cy="9" r="2.4"/><path d="M15.5 13.2c2.6.3 4.5 2.3 5 4.8"/></svg>',
+jobs: '<svg viewBox="0 0 24 24"><path d="M4 8h16v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1z"/><path d="M8 8V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
+material: '<svg viewBox="0 0 24 24"><path d="M4 21V8l8-5 8 5v13"/><path d="M9 21v-6h6v6"/></svg>',
+profit: '<svg viewBox="0 0 24 24"><path d="M3 17l5-6 4 3 6-8"/><path d="M13 6h5v5"/></svg>',
+plus: '<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
+};
+let state = { customers: [], jobs: [], tab: 'dashboard', activeJobId: null, jobSubTab: 'estimate', loaded:false, storageOk:true };
+let draftEstimateItem = {desc:'', qty:'1', unit:'', unitCost:'0', markupPercent:'0'};
+let draftMaterial = {name:'', qty:'1', unit:'', unitPrice:'0'};
+let draftChangeOrder = {date:'', desc:'', amount:'0'};
+function resetDrafts(){
+draftEstimateItem = {desc:'', qty:'1', unit:'', unitCost:'0', markupPercent:'0'};
+draftMaterial = {name:'', qty:'1', unit:'', unitPrice:'0'};
+draftChangeOrder = {date:'', desc:'', amount:'0'};
+}
+const STORAGE_PREFIX = 'tradeprofit_suite_';
+function storageAvailable(){
+try{
+const t = '__tps_test__';
+localStorage.setItem(t, '1');
+localStorage.removeItem(t);
+return true;
+}catch(e){ return false; }
+}
+async function loadAll(){
+state.storageOk = storageAvailable();
+if(!state.storageOk){
+state.customers = [];
+state.jobs = [];
+state.loaded = true;
+return;
+}
+try{
+const c = localStorage.getItem(STORAGE_PREFIX + 'customers');
+state.customers = c ? JSON.parse(c) : [];
+}catch(e){ state.customers = []; }
+try{
+const j = localStorage.getItem(STORAGE_PREFIX + 'jobs');
+state.jobs = j ? JSON.parse(j) : [];
+}catch(e){ state.jobs = []; }
+state.loaded = true;
+}
+async function saveCustomers(){
+try{ localStorage.setItem(STORAGE_PREFIX + 'customers', JSON.stringify(state.customers)); }catch(e){ console.error('save customers failed', e); alert('Could not save — your browser storage may be full or disabled (private/incognito windows often block this).'); }
+}
+async function saveJobs(){
+try{ localStorage.setItem(STORAGE_PREFIX + 'jobs', JSON.stringify(state.jobs)); }catch(e){ console.error('save jobs failed', e); alert('Could not save — your browser storage may be full or disabled (private/incognito windows often block this).'); }
+}
+function exportBackup(){
+const payload = { customers: state.customers, jobs: state.jobs, exportedAt: new Date().toISOString(), app:'TradeProfit Suite' };
+const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+const url = URL.createObjectURL(blob);
+const a = document.createElement('a');
+a.href = url;
+a.download = 'tradeprofit-suite-backup-' + today() + '.json';
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+URL.revokeObjectURL(url);
+}
+function importBackup(file){
+const reader = new FileReader();
+reader.onload = async (e) => {
+try{
+const data = JSON.parse(e.target.result);
+if(!data.customers || !data.jobs) throw new Error('bad file');
+if(!confirm('This will replace everything currently in the app with the backup file. Continue?')) return;
+state.customers = data.customers;
+state.jobs = data.jobs;
+await saveCustomers();
+await saveJobs();
+render();
+alert('Backup restored.');
+}catch(err){
+alert('That file could not be read as a TradeProfit Suite backup.');
+}
+};
+reader.readAsText(file);
+}
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
+function fmt(n){ n = Number(n)||0; return n.toLocaleString('en-US',{style:'currency',currency:'USD'}); }
+function fmtNum(n,d){ n = Number(n)||0; return n.toLocaleString('en-US',{minimumFractionDigits:d||0, maximumFractionDigits:d||2}); }
+function esc(s){ return (s||'').toString().replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function custName(id){ const c = state.customers.find(x=>x.id===id); return c ? c.name : '—'; }
+function today(){ return new Date().toISOString().slice(0,10); }
+function itemsTotal(job){ return (job.estimateItems||[]).reduce((s,i)=> s + (Number(i.qty)||0)*(Number(i.unitCost)||0)*(1+(Number(i.markupPercent)||0)/100), 0); }
+function materialsTotal(job){ return (job.materials||[]).reduce((s,m)=> s + (Number(m.qty)||0)*(Number(m.unitPrice)||0), 0); }
+function laborTotal(job){ return (Number(job.laborRate)||0) * (Number(job.laborHours)||0); }
+function estimateSubtotal(job){ return itemsTotal(job) + materialsTotal(job) + laborTotal(job); }
+function overheadAmt(job){ return estimateSubtotal(job) * ((Number(job.overheadPercent)||0)/100); }
+function taxAmt(job){ return (estimateSubtotal(job)+overheadAmt(job)) * ((Number(job.taxPercent)||0)/100); }
+function estimateTotal(job){ return estimateSubtotal(job) + overheadAmt(job) + taxAmt(job); }
+function approvedChangeOrdersTotal(job){ return (job.changeOrders||[]).filter(c=>c.status==='approved').reduce((s,c)=> s + (Number(c.amount)||0), 0); }
+function invoiceTotal(job){ return estimateTotal(job) + approvedChangeOrdersTotal(job); }
+function actualCostTotal(job){ const a = job.actualCosts||{}; return (Number(a.materials)||0)+(Number(a.labor)||0)+(Number(a.other)||0); }
+function profitAmt(job){ return invoiceTotal(job) - actualCostTotal(job); }
+function profitMargin(job){ const inv = invoiceTotal(job); return inv ? (profitAmt(job)/inv*100) : 0; }
+function ensureJobDefaults(job){
+job.estimateItems = job.estimateItems || [];
+job.materials = job.materials || [];
+job.changeOrders = job.changeOrders || [];
+job.actualCosts = job.actualCosts || {materials:0, labor:0, other:0};
+job.overheadPercent = job.overheadPercent ?? 10;
+job.taxPercent = job.taxPercent ?? 0;
+job.laborRate = job.laborRate ?? 0;
+job.laborHours = job.laborHours ?? 0;
+job.invoiceStatus = job.invoiceStatus || 'unsent';
+job.status = job.status || 'estimate';
+return job;
+}
+const root = document.getElementById('app');
+function render(){
+if(!state.loaded){
+root.innerHTML = '<div style="min-height:400px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:#5B6470;font-family:Inter,sans-serif;"><div style="width:30px;height:30px;border:3px solid #EDE8DA;border-top-color:#E8590C;border-radius:50%;animation:spin .7s linear infinite;"></div><div>Loading your job data…</div></div><style>@keyframes spin{to{transform:rotate(360deg);}}</style>';
+return;
+}
+root.innerHTML = `
+<aside class="sidebar">
+<div class="brand">
+<div class="tag">Contractor Back Office</div>
+<div class="name">TradeProfit<br>Suite</div>
+</div>
+<ul class="nav">
+${navItem('dashboard','Dashboard', ICONS.dashboard)}
+${navItem('customers','Customers', ICONS.customers)}
+${navItem('jobs','Jobs & Estimates', ICONS.jobs)}
+${navItem('materials','Material Calculator', ICONS.material)}
+${navItem('profit','Profit Tracking', ICONS.profit)}
+</ul>
+<div class="sidebar-foot no-print">
+<button id="backupBtn">Backup &amp; restore data</button>
+<button id="loadDemoBtnFooter">Load demo data</button>
+<button id="resetDataBtn">Reset all data</button>
+<button id="termsBtn">Terms of use</button>
+</div>
+</aside>
+<div class="content">
+<div class="topbar no-print">
+<div>
+<h1>${topTitle()}</h1>
+<div class="sub">${topSub()}</div>
+</div>
+<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+<button class="btn btn-ghost btn-sm" id="topBackupBtn" title="Backup & restore">Backup</button>
+<button class="btn btn-ghost btn-sm" id="topDemoBtn" title="Load demo data">Demo</button>
+<button class="btn btn-ghost btn-sm" id="topResetBtn" title="Reset all data">Reset</button>
+<button class="btn btn-ghost btn-sm" id="topTermsBtn" title="Terms of use">Terms</button>
+<div id="topAction"></div>
+</div>
+</div>
+${state.storageOk ? '' : `<div class="no-print" style="background:var(--red-bg);color:var(--red);font-size:12.5px;font-weight:600;padding:9px 28px;">This browser is blocking local storage (common in private/incognito windows), so nothing will save. Open this file in a normal browser window.</div>`}
+<div class="view" id="view"></div>
+</div>
+`;
+document.getElementById('resetDataBtn').onclick = onResetData;
+document.getElementById('loadDemoBtnFooter').onclick = loadDemoData;
+document.getElementById('backupBtn').onclick = openBackupModal;
+document.getElementById('topBackupBtn').onclick = openBackupModal;
+document.getElementById('topDemoBtn').onclick = loadDemoData;
+document.getElementById('topResetBtn').onclick = onResetData;
+document.getElementById('termsBtn').onclick = openTermsModal;
+document.getElementById('topTermsBtn').onclick = openTermsModal;
+renderTopAction();
+renderView();
+}
+function navItem(key,label,icon){
+return `<li class="${state.tab===key?'active':''}"><button data-tab="${key}"><span class="ic">${icon}</span>${label}</button></li>`;
+}
+function topTitle(){
+if(state.tab==='dashboard') return 'Dashboard';
+if(state.tab==='customers') return 'Customers';
+if(state.tab==='jobs') return state.activeJobId ? jobById(state.activeJobId).name : 'Jobs & Estimates';
+if(state.tab==='materials') return 'Material Calculator';
+if(state.tab==='profit') return 'Profit Tracking';
+return '';
+}
+function topSub(){
+if(state.tab==='dashboard') return "Here's where your business stands today.";
+if(state.tab==='customers') return 'Everyone you\'ve bid, billed, or built for.';
+if(state.tab==='jobs') return state.activeJobId ? custName(jobById(state.activeJobId).customerId) : 'Build estimates and turn them into tracked jobs.';
+if(state.tab==='materials') return 'Figure quantities and costs before you buy.';
+if(state.tab==='profit') return 'What every job actually made you.';
+return '';
+}
+function renderTopAction(){
+const el = document.getElementById('topAction');
+el.className = 'no-print';
+if(state.tab==='customers'){
+el.innerHTML = `<button class="btn btn-primary" id="newCustomerBtn">${ICONS.plus} New customer</button>`;
+el.querySelector('#newCustomerBtn').onclick = () => openCustomerModal();
+} else if(state.tab==='jobs' && !state.activeJobId){
+el.innerHTML = `<button class="btn btn-primary" id="newJobBtn">${ICONS.plus} New job</button>`;
+el.querySelector('#newJobBtn').onclick = () => openJobModal();
+} else if(state.tab==='jobs' && state.activeJobId){
+el.innerHTML = `<button class="btn btn-outline" id="backToJobsBtn">&larr; All jobs</button>`;
+el.querySelector('#backToJobsBtn').onclick = () => { state.activeJobId=null; render(); };
+} else {
+el.innerHTML = '';
+}
+}
+root.addEventListener('click', (e) => {
+const navBtn = e.target.closest('[data-tab]');
+if(navBtn){
+state.tab = navBtn.dataset.tab;
+if(state.tab !== 'jobs') { state.activeJobId = null; resetDrafts(); }
+render();
+}
+});
+async function onResetData(){
+if(!confirm('This clears every customer and job stored in this app. This cannot be undone. Continue?')) return;
+state.customers = [];
+state.jobs = [];
+await saveCustomers();
+await saveJobs();
+render();
+}
+function openBackupModal(){
+openModal(`
+<div class="modal-head"><h3>Backup &amp; restore</h3><button class="modal-close" id="mClose">&times;</button></div>
+<div class="modal-body">
+<p style="font-size:13px;color:var(--steel);margin-top:0;">Your data lives only in this browser. Download a backup file regularly, especially before clearing browser data or switching computers.</p>
+<div class="card" style="margin-bottom:14px;">
+<label style="margin-bottom:8px;">Download a backup</label>
+<button class="btn btn-dark" id="doExportBtn">Download backup file</button>
+</div>
+<div class="card">
+<label style="margin-bottom:8px;">Restore from a backup file</label>
+<input type="file" id="importFile" accept="application/json">
+</div>
+</div>
+<div class="modal-foot">
+<button class="btn btn-outline" id="mCancel">Close</button>
+</div>
+`);
+document.getElementById('mClose').onclick = closeModal;
+document.getElementById('mCancel').onclick = closeModal;
+document.getElementById('doExportBtn').onclick = exportBackup;
+document.getElementById('importFile').onchange = (e) => {
+if(e.target.files[0]) importBackup(e.target.files[0]);
+};
+}
+function openTermsModal(){
+openModal(`
+<div class="modal-head"><h3>Terms of use</h3><button class="modal-close" id="mClose">&times;</button></div>
+<div class="modal-body" style="font-size:13px;line-height:1.6;color:var(--ink);">
+<p><b>No warranty.</b> TradeProfit Suite is provided "as is," with no guarantee it is error-free or fit for any particular purpose.</p>
+<p><b>You're responsible for your numbers.</b> All estimates, prices, invoice totals, and profit figures are only as accurate as what you enter. Always double-check your bids and invoices before sending them — TheCre8iveNiche is not responsible for underbid jobs, pricing mistakes, or any financial loss from using this tool.</p>
+<p><b>Your data is your responsibility.</b> Everything is saved locally in your browser only. Use the Backup feature regularly — if your browser data is cleared and you don't have a backup file, that data cannot be recovered.</p>
+<p><b>Licensed for your own use.</b> This tool is licensed for use by the business that purchased it. Copying, reselling, or redistributing the app or its code is not permitted.</p>
+<p style="color:var(--steel);">This is a summary. The full Terms of Use and License were included with your purchase.</p>
+</div>
+<div class="modal-foot">
+<button class="btn btn-outline" id="mCancel">Close</button>
+</div>
+`);
+document.getElementById('mClose').onclick = closeModal;
+document.getElementById('mCancel').onclick = closeModal;
+}
+function jobById(id){ return state.jobs.find(j=>j.id===id); }
+async function loadDemoData(){
+if(state.jobs.length>0 || state.customers.length>0){
+if(!confirm('This adds a sample customer and job alongside your existing data (nothing gets deleted). Continue?')) return;
+}
+const custId = uid();
+const customer = {id:custId, name:'Marcus Bell', phone:'(816) 555-0148', email:'marcus.bell@email.com', address:'214 Oakwood Dr, Independence, MO', notes:'Sample customer — safe to delete.'};
+state.customers.push(customer);
+const job = ensureJobDefaults({
+id:uid(), name:'Deck Rebuild — Bell Residence', customerId:custId, createdAt:today(), status:'active', invoiceStatus:'sent',
+estimateItems:[
+{id:uid(), desc:'Demo & haul-away', qty:1, unit:'job', unitCost:450, markupPercent:15},
+{id:uid(), desc:'Framing labor', qty:24, unit:'hr', unitCost:65, markupPercent:0}
+],
+laborRate:65, laborHours:24, overheadPercent:10, taxPercent:8.1,
+materials:[
+{id:uid(), name:'2x6 pressure-treated joists', qty:40, unit:'ea', unitPrice:14.50},
+{id:uid(), name:'Composite decking boards', qty:60, unit:'ea', unitPrice:32}
+],
+actualCosts:{materials:2100, labor:1560, other:200},
+changeOrders:[
+{id:uid(), date:today(), desc:'Add stair railing per code', amount:380, status:'approved'}
+]
+});
+state.jobs.push(job);
+await saveCustomers();
+await saveJobs();
+render();
+}
+function renderView(){
+const v = document.getElementById('view');
+if(state.tab==='dashboard'){ v.innerHTML = viewDashboard(); wrapTables(v); const ldb=document.getElementById('loadDemoBtn'); if(ldb) ldb.onclick = loadDemoData; return; }
+if(state.tab==='customers') return renderCustomersView(v);
+if(state.tab==='jobs') return state.activeJobId ? renderJobDetail(v) : renderJobsList(v);
+if(state.tab==='materials') return renderMaterialCalc(v);
+if(state.tab==='profit') return renderProfitView(v);
+}
+function viewDashboard(){
+const jobs = state.jobs.map(ensureJobDefaults);
+const active = jobs.filter(j=>j.status==='active').length;
+const pipeline = jobs.filter(j=>j.status==='estimate').reduce((s,j)=>s+estimateTotal(j),0);
+const totalProfit = jobs.reduce((s,j)=>s+profitAmt(j),0);
+const invoicedOutstanding = jobs.filter(j=>j.invoiceStatus==='sent').reduce((s,j)=>s+invoiceTotal(j),0);
+const recent = [...jobs].sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||'')).slice(0,6);
+return `
+<div class="grid grid-4">
+<div class="stat orange"><div class="lbl">Open estimates</div><div class="val">${fmt(pipeline)}</div></div>
+<div class="stat">${''}<div class="lbl">Active jobs</div><div class="val">${active}</div></div>
+<div class="stat steel"><div class="lbl">Invoiced, unpaid</div><div class="val">${fmt(invoicedOutstanding)}</div></div>
+<div class="stat green"><div class="lbl">Total profit</div><div class="val">${fmt(totalProfit)}</div></div>
+</div>
+<h2 class="section-title">Recent jobs</h2>
+${recent.length ? `
+<table class="list">
+<tr><th>Job</th><th>Customer</th><th>Status</th><th class="num">Estimate</th><th class="num">Profit</th></tr>
+${recent.map(j=>`
+<tr class="clickable" data-open-job="${j.id}">
+<td><b>${esc(j.name)}</b></td>
+<td>${esc(custName(j.customerId))}</td>
+<td><span class="badge ${j.status}">${j.status}</span></td>
+<td class="num">${fmt(estimateTotal(j))}</td>
+<td class="num ${profitAmt(j)>=0?'profit-pos':'profit-neg'}">${fmt(profitAmt(j))}</td>
+</tr>`).join('')}
+</table>` : emptyStateWithDemo()}
+`;
+}
+function emptyStateWithDemo(){
+return `<div class="empty"><b>No jobs yet</b>Create your first estimate to see it here.<div style="margin-top:14px;"><button class="btn btn-outline btn-sm" id="loadDemoBtn">Load demo data to see how it works</button></div></div>`;
+}
+function renderCustomersView(v){
+const list = state.customers;
+v.innerHTML = list.length ? `
+<table class="list">
+<tr><th>Name</th><th>Phone</th><th>Email</th><th>Address</th><th></th></tr>
+${list.map(c=>`
+<tr>
+<td><b>${esc(c.name)}</b>${c.notes?`<div style="font-size:11.5px;color:var(--steel);margin-top:2px;">${esc(c.notes)}</div>`:''}</td>
+<td class="mono">${esc(c.phone||'—')}</td>
+<td>${esc(c.email||'—')}</td>
+<td>${esc(c.address||'—')}</td>
+<td style="text-align:right;white-space:nowrap;">
+<button class="btn btn-ghost btn-sm" data-edit-cust="${c.id}">Edit</button>
+<button class="btn btn-ghost btn-sm" data-del-cust="${c.id}">Delete</button>
+</td>
+</tr>`).join('')}
+</table>
+` : emptyState('No customers yet','Add a customer so you can attach jobs and estimates to them.');
+wrapTables(v);
+v.querySelectorAll('[data-edit-cust]').forEach(b=> b.onclick = () => openCustomerModal(b.dataset.editCust));
+v.querySelectorAll('[data-del-cust]').forEach(b=> b.onclick = async () => {
+const inUse = state.jobs.some(j=>j.customerId===b.dataset.delCust);
+if(inUse && !confirm('This customer has jobs attached. Delete anyway? The jobs will keep their own records but show no customer name.')) return;
+if(!inUse && !confirm('Delete this customer?')) return;
+state.customers = state.customers.filter(c=>c.id!==b.dataset.delCust);
+await saveCustomers();
+renderView();
+});
+}
+function openCustomerModal(editId){
+const editing = editId ? state.customers.find(c=>c.id===editId) : null;
+const c = editing || {id:uid(), name:'', phone:'', email:'', address:'', notes:''};
+openModal(`
+<div class="modal-head"><h3>${editing?'Edit customer':'New customer'}</h3><button class="modal-close" id="mClose">&times;</button></div>
+<div class="modal-body">
+<div class="field"><label>Name</label><input id="fName" value="${esc(c.name)}" placeholder="Jordan Reyes"></div>
+<div class="row">
+<div class="field"><label>Phone</label><input id="fPhone" value="${esc(c.phone)}" placeholder="(555) 010-0199"></div>
+<div class="field"><label>Email</label><input id="fEmail" value="${esc(c.email)}" placeholder="name@email.com"></div>
+</div>
+<div class="field"><label>Job site address</label><input id="fAddr" value="${esc(c.address)}" placeholder="123 Main St, City, ST"></div>
+<div class="field"><label>Notes</label><textarea id="fNotes" rows="2" placeholder="Referral source, gate code, etc.">${esc(c.notes)}</textarea></div>
+</div>
+<div class="modal-foot">
+<button class="btn btn-outline" id="mCancel">Cancel</button>
+<button class="btn btn-primary" id="mSave">Save customer</button>
+</div>
+`);
+document.getElementById('mClose').onclick = closeModal;
+document.getElementById('mCancel').onclick = closeModal;
+document.getElementById('mSave').onclick = async () => {
+c.name = document.getElementById('fName').value.trim() || 'Unnamed customer';
+c.phone = document.getElementById('fPhone').value.trim();
+c.email = document.getElementById('fEmail').value.trim();
+c.address = document.getElementById('fAddr').value.trim();
+c.notes = document.getElementById('fNotes').value.trim();
+if(!editing) state.customers.push(c);
+await saveCustomers();
+closeModal();
+renderView();
+};
+}
+function renderJobsList(v){
+const jobs = state.jobs.map(ensureJobDefaults);
+v.innerHTML = jobs.length ? `
+<table class="list">
+<tr><th>Job</th><th>Customer</th><th>Status</th><th class="num">Estimate total</th><th class="num">Profit so far</th><th></th></tr>
+${jobs.map(j=>`
+<tr class="clickable" data-open-job="${j.id}">
+<td><b>${esc(j.name)}</b></td>
+<td>${esc(custName(j.customerId))}</td>
+<td><span class="badge ${j.status}">${j.status}</span></td>
+<td class="num">${fmt(estimateTotal(j))}</td>
+<td class="num ${profitAmt(j)>=0?'profit-pos':'profit-neg'}">${fmt(profitAmt(j))}</td>
+<td style="text-align:right;"><button class="btn btn-ghost btn-sm" data-del-job="${j.id}">Delete</button></td>
+</tr>`).join('')}
+</table>
+` : emptyState('No jobs yet','Click "New job" to build your first estimate.');
+wrapTables(v);
+v.querySelectorAll('[data-open-job]').forEach(row=> row.onclick = (e) => {
+if(e.target.closest('[data-del-job]')) return;
+state.activeJobId = row.dataset.openJob;
+state.jobSubTab = 'estimate';
+resetDrafts();
+render();
+});
+v.querySelectorAll('[data-del-job]').forEach(b=> b.onclick = async (e) => {
+e.stopPropagation();
+if(!confirm('Delete this job and all its estimate, cost, and invoice data?')) return;
+state.jobs = state.jobs.filter(j=>j.id!==b.dataset.delJob);
+await saveJobs();
+renderView();
+});
+}
+function openJobModal(){
+if(state.customers.length===0){
+alert('Add a customer first — every job needs one attached.');
+state.tab='customers';
+render();
+return;
+}
+openModal(`
+<div class="modal-head"><h3>New job</h3><button class="modal-close" id="mClose">&times;</button></div>
+<div class="modal-body">
+<div class="field"><label>Job name</label><input id="fJobName" placeholder="Deck rebuild — Reyes residence"></div>
+<div class="field"><label>Customer</label>
+<select id="fCust">${state.customers.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select>
+</div>
+</div>
+<div class="modal-foot">
+<button class="btn btn-outline" id="mCancel">Cancel</button>
+<button class="btn btn-primary" id="mSave">Create job</button>
+</div>
+`);
+document.getElementById('mClose').onclick = closeModal;
+document.getElementById('mCancel').onclick = closeModal;
+document.getElementById('mSave').onclick = async () => {
+const name = document.getElementById('fJobName').value.trim() || 'Untitled job';
+const customerId = document.getElementById('fCust').value;
+const job = ensureJobDefaults({id:uid(), name, customerId, createdAt: today()});
+state.jobs.push(job);
+await saveJobs();
+closeModal();
+state.activeJobId = job.id;
+state.jobSubTab = 'estimate';
+resetDrafts();
+render();
+};
+}
+function renderJobDetail(v){
+const job = ensureJobDefaults(jobById(state.activeJobId));
+if(!job){ state.activeJobId=null; return renderJobsList(v); }
+v.innerHTML = `
+<div class="job-head no-print">
+<div>
+<h2>${esc(job.name)}</h2>
+<div class="cust">For ${esc(custName(job.customerId))}</div>
+</div>
+<div style="display:flex;gap:14px;align-items:center;">
+<div class="field" style="margin:0;min-width:140px;">
+<label>Status</label>
+<select id="jobStatus">
+${['estimate','active','invoiced','complete'].map(s=>`<option value="${s}" ${job.status===s?'selected':''}>${s[0].toUpperCase()+s.slice(1)}</option>`).join('')}
+</select>
+</div>
+</div>
+</div>
+<div class="subnav no-print">
+${subTabBtn('estimate','Estimate')}
+${subTabBtn('materials','Materials')}
+${subTabBtn('costs','Job Costs')}
+${subTabBtn('changeorders','Change Orders')}
+${subTabBtn('invoice','Invoice')}
+</div>
+<div id="jobSubView"></div>
+`;
+document.getElementById('jobStatus').onchange = async (e) => { job.status = e.target.value; await saveJobs(); };
+v.querySelectorAll('[data-subtab]').forEach(b=> b.onclick = () => { state.jobSubTab = b.dataset.subtab; resetDrafts(); renderJobDetail(document.getElementById('view')); });
+const sv = document.getElementById('jobSubView');
+if(state.jobSubTab==='estimate') renderEstimateSection(sv, job);
+else if(state.jobSubTab==='materials') renderMaterialsSection(sv, job);
+else if(state.jobSubTab==='costs') renderCostsSection(sv, job);
+else if(state.jobSubTab==='changeorders') renderChangeOrdersSection(sv, job);
+else if(state.jobSubTab==='invoice') renderInvoiceSection(sv, job);
+}
+function subTabBtn(key,label){
+return `<button data-subtab="${key}" class="${state.jobSubTab===key?'active':''}">${label}</button>`;
+}
+function renderEstimateSection(v, job){
+const dr = draftEstimateItem;
+v.innerHTML = `
+<h2 class="section-title">Line items (labor, subcontractors, misc.)</h2>
+<table class="list inline-table">
+<tr><th>Description</th><th style="width:70px;">Qty</th><th style="width:80px;">Unit</th><th style="width:110px;" class="num">Unit cost</th><th style="width:90px;" class="num">Markup %</th><th style="width:100px;" class="num">Line total</th><th style="width:34px;"></th></tr>
+${job.estimateItems.map(i=>`
+<tr>
+<td data-label="Description"><input value="${esc(i.desc)}" data-item="${i.id}" data-field="desc"></td>
+<td data-label="Qty"><input type="number" value="${i.qty}" data-item="${i.id}" data-field="qty"></td>
+<td data-label="Unit"><input value="${esc(i.unit||'')}" data-item="${i.id}" data-field="unit"></td>
+<td data-label="Unit cost"><input type="number" value="${i.unitCost}" data-item="${i.id}" data-field="unitCost"></td>
+<td data-label="Markup %"><input type="number" value="${i.markupPercent}" data-item="${i.id}" data-field="markupPercent"></td>
+<td data-label="Line total" class="num mono">${fmt((Number(i.qty)||0)*(Number(i.unitCost)||0)*(1+(Number(i.markupPercent)||0)/100))}</td>
+<td class="del-cell"><button class="btn btn-ghost btn-sm" data-del-item="${i.id}">✕</button></td>
+</tr>`).join('')}
+</table>
+<div class="add-row-form">
+<div class="field"><label>Description</label><input id="niDesc" placeholder="Framing labor" value="${esc(dr.desc)}"></div>
+<div class="field" style="max-width:70px;"><label>Qty</label><input id="niQty" type="number" value="${esc(dr.qty)}"></div>
+<div class="field" style="max-width:80px;"><label>Unit</label><input id="niUnit" placeholder="hr" value="${esc(dr.unit)}"></div>
+<div class="field" style="max-width:110px;"><label>Unit cost ($)</label><input id="niCost" type="number" value="${esc(dr.unitCost)}"></div>
+<div class="field" style="max-width:90px;"><label>Markup %</label><input id="niMarkup" type="number" value="${esc(dr.markupPercent)}"></div>
+<button class="btn btn-dark btn-sm" id="addItemBtn">Add line</button>
+</div>
+<h2 class="section-title">Labor</h2>
+<div class="row" style="max-width:420px;">
+<div class="field"><label>Labor rate ($/hr)</label><input type="number" id="laborRate" value="${job.laborRate}"></div>
+<div class="field"><label>Estimated hours</label><input type="number" id="laborHours" value="${job.laborHours}"></div>
+</div>
+<h2 class="section-title">Overhead &amp; tax</h2>
+<div class="row" style="max-width:420px;">
+<div class="field"><label>Overhead %</label><input type="number" id="overheadPct" value="${job.overheadPercent}"></div>
+<div class="field"><label>Sales tax %</label><input type="number" id="taxPct" value="${job.taxPercent}"></div>
+</div>
+<div class="card" style="max-width:420px;">
+<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;"><span>Line items + materials + labor</span><span class="mono">${fmt(estimateSubtotal(job))}</span></div>
+<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;"><span>Overhead</span><span class="mono">${fmt(overheadAmt(job))}</span></div>
+<div style="display:flex;justify-content:space-between;font-size:13px;padding:3px 0;"><span>Tax</span><span class="mono">${fmt(taxAmt(job))}</span></div>
+<div style="display:flex;justify-content:space-between;font-size:15px;font-weight:700;padding:8px 0 0;border-top:1px solid var(--line);margin-top:6px;"><span>Estimate total</span><span class="mono">${fmt(estimateTotal(job))}</span></div>
+</div>
+`;
+v.querySelectorAll('input[data-item]').forEach(inp => inp.onchange = async () => {
+const item = job.estimateItems.find(i=>i.id===inp.dataset.item);
+const f = inp.dataset.field;
+item[f] = (f==='desc'||f==='unit') ? inp.value : Number(inp.value);
+await saveJobs();
+renderEstimateSection(v, job);
+});
+v.querySelectorAll('[data-del-item]').forEach(b=> b.onclick = async () => {
+job.estimateItems = job.estimateItems.filter(i=>i.id!==b.dataset.delItem);
+await saveJobs();
+renderEstimateSection(v, job);
+});
+const niDesc=document.getElementById('niDesc'), niQty=document.getElementById('niQty'), niUnit=document.getElementById('niUnit'), niCost=document.getElementById('niCost'), niMarkup=document.getElementById('niMarkup');
+niDesc.oninput = () => draftEstimateItem.desc = niDesc.value;
+niQty.oninput = () => draftEstimateItem.qty = niQty.value;
+niUnit.oninput = () => draftEstimateItem.unit = niUnit.value;
+niCost.oninput = () => draftEstimateItem.unitCost = niCost.value;
+niMarkup.oninput = () => draftEstimateItem.markupPercent = niMarkup.value;
+document.getElementById('addItemBtn').onclick = async () => {
+const desc = niDesc.value.trim();
+if(!desc) return;
+job.estimateItems.push({
+id:uid(), desc,
+qty:Number(niQty.value)||0,
+unit:niUnit.value.trim(),
+unitCost:Number(niCost.value)||0,
+markupPercent:Number(niMarkup.value)||0
+});
+draftEstimateItem = {desc:'', qty:'1', unit:'', unitCost:'0', markupPercent:'0'};
+await saveJobs();
+renderEstimateSection(v, job);
+};
+document.getElementById('laborRate').onchange = async (e) => { job.laborRate = Number(e.target.value)||0; await saveJobs(); renderEstimateSection(v, job); };
+document.getElementById('laborHours').onchange = async (e) => { job.laborHours = Number(e.target.value)||0; await saveJobs(); renderEstimateSection(v, job); };
+document.getElementById('overheadPct').onchange = async (e) => { job.overheadPercent = Number(e.target.value)||0; await saveJobs(); renderEstimateSection(v, job); };
+document.getElementById('taxPct').onchange = async (e) => { job.taxPercent = Number(e.target.value)||0; await saveJobs(); renderEstimateSection(v, job); };
+wrapTables(v);
+}
+function renderMaterialsSection(v, job){
+const dr = draftMaterial;
+v.innerHTML = `
+<h2 class="section-title">Materials list</h2>
+<table class="list inline-table">
+<tr><th>Material</th><th style="width:80px;">Qty</th><th style="width:80px;">Unit</th><th style="width:110px;" class="num">Unit price</th><th style="width:100px;" class="num">Total</th><th style="width:34px;"></th></tr>
+${job.materials.length ? job.materials.map(m=>`
+<tr>
+<td data-label="Material"><input value="${esc(m.name)}" data-mat="${m.id}" data-field="name"></td>
+<td data-label="Qty"><input type="number" value="${m.qty}" data-mat="${m.id}" data-field="qty"></td>
+<td data-label="Unit"><input value="${esc(m.unit||'')}" data-mat="${m.id}" data-field="unit"></td>
+<td data-label="Unit price"><input type="number" value="${m.unitPrice}" data-mat="${m.id}" data-field="unitPrice"></td>
+<td data-label="Total" class="num mono">${fmt((Number(m.qty)||0)*(Number(m.unitPrice)||0))}</td>
+<td class="del-cell"><button class="btn btn-ghost btn-sm" data-del-mat="${m.id}">✕</button></td>
+</tr>`).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--steel);padding:16px;">No materials yet. Add one below, or use the Material Calculator tab and send items here.</td></tr>`}
+</table>
+<div class="add-row-form">
+<div class="field"><label>Material</label><input id="nmName" placeholder="2x6 pressure-treated lumber" value="${esc(dr.name)}"></div>
+<div class="field" style="max-width:80px;"><label>Qty</label><input id="nmQty" type="number" value="${esc(dr.qty)}"></div>
+<div class="field" style="max-width:80px;"><label>Unit</label><input id="nmUnit" placeholder="ea" value="${esc(dr.unit)}"></div>
+<div class="field" style="max-width:110px;"><label>Unit price ($)</label><input id="nmPrice" type="number" value="${esc(dr.unitPrice)}"></div>
+<button class="btn btn-dark btn-sm" id="addMatBtn">Add material</button>
+</div>
+<div class="card" style="max-width:320px;">
+<div style="display:flex;justify-content:space-between;font-weight:700;font-size:14px;"><span>Materials total</span><span class="mono">${fmt(materialsTotal(job))}</span></div>
+</div>
+`;
+v.querySelectorAll('input[data-mat]').forEach(inp => inp.onchange = async () => {
+const m = job.materials.find(x=>x.id===inp.dataset.mat);
+const f = inp.dataset.field;
+m[f] = (f==='name'||f==='unit') ? inp.value : Number(inp.value);
+await saveJobs();
+renderMaterialsSection(v, job);
+});
+v.querySelectorAll('[data-del-mat]').forEach(b=> b.onclick = async () => {
+job.materials = job.materials.filter(m=>m.id!==b.dataset.delMat);
+await saveJobs();
+renderMaterialsSection(v, job);
+});
+const nmName=document.getElementById('nmName'), nmQty=document.getElementById('nmQty'), nmUnit=document.getElementById('nmUnit'), nmPrice=document.getElementById('nmPrice');
+nmName.oninput = () => draftMaterial.name = nmName.value;
+nmQty.oninput = () => draftMaterial.qty = nmQty.value;
+nmUnit.oninput = () => draftMaterial.unit = nmUnit.value;
+nmPrice.oninput = () => draftMaterial.unitPrice = nmPrice.value;
+document.getElementById('addMatBtn').onclick = async () => {
+const name = nmName.value.trim();
+if(!name) return;
+job.materials.push({id:uid(), name, qty:Number(nmQty.value)||0, unit:nmUnit.value.trim(), unitPrice:Number(nmPrice.value)||0});
+draftMaterial = {name:'', qty:'1', unit:'', unitPrice:'0'};
+await saveJobs();
+renderMaterialsSection(v, job);
+};
+wrapTables(v);
+}
+function renderCostsSection(v, job){
+const est = estimateSubtotal(job);
+const act = actualCostTotal(job);
+const variance = est - act;
+v.innerHTML = `
+<h2 class="section-title">Actual costs to date</h2>
+<div class="row" style="max-width:520px;">
+<div class="field"><label>Materials spent</label><input type="number" id="acMat" value="${job.actualCosts.materials}"></div>
+<div class="field"><label>Labor spent</label><input type="number" id="acLabor" value="${job.actualCosts.labor}"></div>
+<div class="field"><label>Other spent</label><input type="number" id="acOther" value="${job.actualCosts.other}"></div>
+</div>
+<h2 class="section-title">Estimate vs. actual</h2>
+<table class="list">
+<tr><th></th><th class="num">Estimated</th><th class="num">Actual</th><th class="num">Variance</th></tr>
+<tr><td>Job cost subtotal</td><td class="num mono">${fmt(est)}</td><td class="num mono">${fmt(act)}</td><td class="num mono ${variance>=0?'profit-pos':'profit-neg'}">${fmt(variance)}</td></tr>
+</table>
+<div class="totals-strip">
+<div class="t">Invoice total<b>${fmt(invoiceTotal(job))}</b></div>
+<div class="t">Total actual cost<b>${fmt(act)}</b></div>
+<div class="t">Profit<b class="${profitAmt(job)>=0?'profit-pos':'profit-neg'}">${fmt(profitAmt(job))}</b></div>
+<div class="t">Margin<b>${fmtNum(profitMargin(job),1)}%</b></div>
+</div>
+`;
+['acMat','acLabor','acOther'].forEach((id,idx)=>{
+const key = ['materials','labor','other'][idx];
+document.getElementById(id).onchange = async (e) => {
+job.actualCosts[key] = Number(e.target.value)||0;
+await saveJobs();
+renderCostsSection(v, job);
+};
+});
+wrapTables(v);
+}
+function renderChangeOrdersSection(v, job){
+const dr = draftChangeOrder;
+v.innerHTML = `
+<h2 class="section-title">Change orders</h2>
+<table class="list inline-table">
+<tr><th style="width:110px;">Date</th><th>Description</th><th style="width:110px;" class="num">Amount</th><th style="width:110px;">Status</th><th style="width:34px;"></th></tr>
+${job.changeOrders.length ? job.changeOrders.map(c=>`
+<tr>
+<td data-label="Date"><input type="date" value="${c.date}" data-co="${c.id}" data-field="date"></td>
+<td data-label="Description"><input value="${esc(c.desc)}" data-co="${c.id}" data-field="desc"></td>
+<td data-label="Amount"><input type="number" value="${c.amount}" data-co="${c.id}" data-field="amount"></td>
+<td data-label="Status">
+<select data-co="${c.id}" data-field="status">
+<option value="pending" ${c.status==='pending'?'selected':''}>Pending</option>
+<option value="approved" ${c.status==='approved'?'selected':''}>Approved</option>
+<option value="declined" ${c.status==='declined'?'selected':''}>Declined</option>
+</select>
+</td>
+<td class="del-cell"><button class="btn btn-ghost btn-sm" data-del-co="${c.id}">✕</button></td>
+</tr>`).join('') : `<tr><td colspan="5" style="text-align:center;color:var(--steel);padding:16px;">No change orders on this job.</td></tr>`}
+</table>
+<div class="add-row-form">
+<div class="field" style="max-width:130px;"><label>Date</label><input type="date" id="ncoDate" value="${esc(dr.date||today())}"></div>
+<div class="field"><label>Description</label><input id="ncoDesc" placeholder="Add egress window per code" value="${esc(dr.desc)}"></div>
+<div class="field" style="max-width:110px;"><label>Amount ($)</label><input type="number" id="ncoAmount" value="${esc(dr.amount)}"></div>
+<button class="btn btn-dark btn-sm" id="addCoBtn">Add change order</button>
+</div>
+<div class="card" style="max-width:320px;">
+<div style="display:flex;justify-content:space-between;font-weight:700;font-size:14px;"><span>Approved change orders</span><span class="mono">${fmt(approvedChangeOrdersTotal(job))}</span></div>
+</div>
+`;
+v.querySelectorAll('[data-co]').forEach(inp => inp.onchange = async () => {
+const c = job.changeOrders.find(x=>x.id===inp.dataset.co);
+const f = inp.dataset.field;
+c[f] = f==='amount' ? Number(inp.value) : inp.value;
+await saveJobs();
+renderChangeOrdersSection(v, job);
+});
+v.querySelectorAll('[data-del-co]').forEach(b=> b.onclick = async () => {
+job.changeOrders = job.changeOrders.filter(c=>c.id!==b.dataset.delCo);
+await saveJobs();
+renderChangeOrdersSection(v, job);
+});
+const ncoDate=document.getElementById('ncoDate'), ncoDesc=document.getElementById('ncoDesc'), ncoAmount=document.getElementById('ncoAmount');
+ncoDate.oninput = () => draftChangeOrder.date = ncoDate.value;
+ncoDesc.oninput = () => draftChangeOrder.desc = ncoDesc.value;
+ncoAmount.oninput = () => draftChangeOrder.amount = ncoAmount.value;
+document.getElementById('addCoBtn').onclick = async () => {
+const desc = ncoDesc.value.trim();
+if(!desc) return;
+job.changeOrders.push({id:uid(), date:ncoDate.value||today(), desc, amount:Number(ncoAmount.value)||0, status:'pending'});
+draftChangeOrder = {date:'', desc:'', amount:'0'};
+await saveJobs();
+renderChangeOrdersSection(v, job);
+};
+wrapTables(v);
+}
+function renderInvoiceSection(v, job){
+const cust = state.customers.find(c=>c.id===job.customerId) || {};
+const approvedCOs = job.changeOrders.filter(c=>c.status==='approved');
+v.innerHTML = `
+<div class="no-print" style="margin-bottom:14px;display:flex;gap:10px;align-items:center;">
+<label style="margin:0;">Invoice status</label>
+<select id="invStatus" style="max-width:150px;">
+<option value="unsent" ${job.invoiceStatus==='unsent'?'selected':''}>Unsent</option>
+<option value="sent" ${job.invoiceStatus==='sent'?'selected':''}>Sent</option>
+<option value="paid" ${job.invoiceStatus==='paid'?'selected':''}>Paid</option>
+</select>
+<button class="btn btn-outline btn-sm" id="printInvBtn">Print / Save as PDF</button>
+</div>
+<div class="invoice-sheet">
+<div class="inv-top">
+<div>
+<h2>Invoice</h2>
+<div style="font-size:12px;color:var(--steel);margin-top:4px;">Job: ${esc(job.name)}</div>
+</div>
+<div style="text-align:right;font-size:12.5px;">
+<div>Date: ${today()}</div>
+<div>Status: <span class="badge ${job.invoiceStatus}">${job.invoiceStatus}</span></div>
+</div>
+</div>
+<div style="font-size:13px;margin-bottom:16px;">
+<b>Bill to:</b><br>
+${esc(cust.name||'—')}<br>
+${esc(cust.address||'')}<br>
+${esc(cust.phone||'')} ${cust.email?(' · '+esc(cust.email)):''}
+</div>
+<table style="width:100%;">
+<tr style="border-bottom:1.5px solid var(--charcoal);"><th style="text-align:left;">Item</th><th class="num" style="text-align:right;">Amount</th></tr>
+${job.estimateItems.map(i=>`<tr><td style="padding:6px 4px;">${esc(i.desc)} (${i.qty} ${esc(i.unit||'')})</td><td class="num mono" style="padding:6px 4px;">${fmt((Number(i.qty)||0)*(Number(i.unitCost)||0)*(1+(Number(i.markupPercent)||0)/100))}</td></tr>`).join('')}
+${job.materials.length ? `<tr><td style="padding:6px 4px;">Materials</td><td class="num mono" style="padding:6px 4px;">${fmt(materialsTotal(job))}</td></tr>`:''}
+${laborTotal(job) ? `<tr><td style="padding:6px 4px;">Labor (${job.laborHours} hrs @ ${fmt(job.laborRate)}/hr)</td><td class="num mono" style="padding:6px 4px;">${fmt(laborTotal(job))}</td></tr>`:''}
+<tr><td style="padding:6px 4px;">Overhead</td><td class="num mono" style="padding:6px 4px;">${fmt(overheadAmt(job))}</td></tr>
+<tr><td style="padding:6px 4px;">Tax</td><td class="num mono" style="padding:6px 4px;">${fmt(taxAmt(job))}</td></tr>
+${approvedCOs.map(c=>`<tr><td style="padding:6px 4px;">Change order: ${esc(c.desc)}</td><td class="num mono" style="padding:6px 4px;">${fmt(c.amount)}</td></tr>`).join('')}
+</table>
+<div style="display:flex;justify-content:flex-end;margin-top:14px;padding-top:10px;border-top:2px solid var(--charcoal);">
+<div class="grand">Total due: ${fmt(invoiceTotal(job))}</div>
+</div>
+</div>
+`;
+document.getElementById('invStatus').onchange = async (e) => { job.invoiceStatus = e.target.value; await saveJobs(); renderInvoiceSection(v, job); };
+document.getElementById('printInvBtn').onclick = () => window.print();
+}
+function renderMaterialCalc(v){
+v.innerHTML = `
+<div class="card" style="max-width:520px;">
+<h2 class="section-title" style="margin-top:0;">Quick material calculator</h2>
+<div class="field">
+<label>Coverage type</label>
+<select id="calcType">
+<option value="area">Area (length × width)</option>
+<option value="linear">Linear (single length)</option>
+<option value="count">Count (just quantity)</option>
+</select>
+</div>
+<div class="row" id="calcDims">
+<div class="field"><label>Length (ft)</label><input type="number" id="calcLen" value="10"></div>
+<div class="field" id="calcWidthWrap"><label>Width (ft)</label><input type="number" id="calcWidth" value="10"></div>
+</div>
+<div class="row">
+<div class="field"><label>Coverage per unit</label><input type="number" id="calcCoverage" value="1" placeholder="e.g. sq ft per bag"></div>
+<div class="field"><label>Waste / overage %</label><input type="number" id="calcWaste" value="10"></div>
+</div>
+<div class="field"><label>Price per unit</label><input type="number" id="calcPrice" value="0"></div>
+<button class="btn btn-dark" id="calcRunBtn">Calculate</button>
+<div id="calcResult" style="margin-top:16px;"></div>
+</div>
+`;
+const typeSel = document.getElementById('calcType');
+typeSel.onchange = () => {
+const wrap = document.getElementById('calcWidthWrap');
+const lenLabel = document.querySelector('#calcDims .field:first-child label');
+if(typeSel.value==='area'){ wrap.style.display=''; lenLabel.textContent='Length (ft)'; }
+else if(typeSel.value==='linear'){ wrap.style.display='none'; lenLabel.textContent='Total length (ft)'; }
+else { wrap.style.display='none'; lenLabel.textContent='Quantity needed'; }
+};
+document.getElementById('calcRunBtn').onclick = () => {
+const type = typeSel.value;
+const len = Number(document.getElementById('calcLen').value)||0;
+const width = Number(document.getElementById('calcWidth').value)||0;
+const coverage = Number(document.getElementById('calcCoverage').value)||1;
+const waste = Number(document.getElementById('calcWaste').value)||0;
+const price = Number(document.getElementById('calcPrice').value)||0;
+let rawQty;
+if(type==='area') rawQty = len*width;
+else if(type==='linear') rawQty = len;
+else rawQty = len;
+const withWaste = rawQty * (1+waste/100);
+const units = coverage>0 ? Math.ceil(withWaste/coverage) : withWaste;
+const cost = units*price;
+document.getElementById('calcResult').innerHTML = `
+<div class="totals-strip">
+<div class="t">${type==='area'?'Area':'Quantity'}<b>${fmtNum(rawQty,2)} ${type==='area'?'sq ft':''}</b></div>
+<div class="t">With waste<b>${fmtNum(withWaste,2)}</b></div>
+<div class="t">Units to buy<b>${fmtNum(units,0)}</b></div>
+<div class="t">Estimated cost<b>${fmt(cost)}</b></div>
+</div>
+<div style="margin-top:14px;" id="sendToJobWrap"></div>
+`;
+const wrap = document.getElementById('sendToJobWrap');
+if(state.jobs.length){
+wrap.innerHTML = `
+<div class="row" style="align-items:flex-end;max-width:420px;">
+<div class="field"><label>Send to job</label>
+<select id="sendJobSel">${state.jobs.map(j=>`<option value="${j.id}">${esc(j.name)}</option>`).join('')}</select>
+</div>
+<div class="field" style="max-width:180px;"><label>Material name</label><input id="sendMatName" placeholder="e.g. 80lb concrete bags"></div>
+<button class="btn btn-primary btn-sm" id="sendToJobBtn">Add to job materials</button>
+</div>
+`;
+document.getElementById('sendToJobBtn').onclick = async () => {
+const jid = document.getElementById('sendJobSel').value;
+const job = ensureJobDefaults(jobById(jid));
+const name = document.getElementById('sendMatName').value.trim() || 'Material';
+job.materials.push({id:uid(), name, qty:units, unit:'ea', unitPrice:price});
+await saveJobs();
+alert('Added to "'+job.name+'" — you can see it under that job\'s Materials tab.');
+};
+} else {
+wrap.innerHTML = `<div style="font-size:12.5px;color:var(--steel);">Create a job first if you want to send this material list to it.</div>`;
+}
+};
+}
+function renderProfitView(v){
+const jobs = state.jobs.map(ensureJobDefaults);
+if(!jobs.length){ v.innerHTML = emptyState('Nothing to track yet','Profit numbers will show up here once you have jobs with estimates and actual costs.'); return; }
+const totalInvoice = jobs.reduce((s,j)=>s+invoiceTotal(j),0);
+const totalCost = jobs.reduce((s,j)=>s+actualCostTotal(j),0);
+const totalProfit = totalInvoice-totalCost;
+const avgMargin = jobs.length ? jobs.reduce((s,j)=>s+profitMargin(j),0)/jobs.length : 0;
+v.innerHTML = `
+<div class="grid grid-4">
+<div class="stat"><div class="lbl">Total invoiced</div><div class="val">${fmt(totalInvoice)}</div></div>
+<div class="stat steel"><div class="lbl">Total actual cost</div><div class="val">${fmt(totalCost)}</div></div>
+<div class="stat green"><div class="lbl">Total profit</div><div class="val">${fmt(totalProfit)}</div></div>
+<div class="stat orange"><div class="lbl">Avg. margin</div><div class="val">${fmtNum(avgMargin,1)}%</div></div>
+</div>
+<h2 class="section-title">By job</h2>
+<table class="list">
+<tr><th>Job</th><th>Customer</th><th class="num">Invoice total</th><th class="num">Actual cost</th><th class="num">Profit</th><th class="num">Margin</th></tr>
+${jobs.map(j=>`
+<tr>
+<td><b>${esc(j.name)}</b></td>
+<td>${esc(custName(j.customerId))}</td>
+<td class="num mono">${fmt(invoiceTotal(j))}</td>
+<td class="num mono">${fmt(actualCostTotal(j))}</td>
+<td class="num mono ${profitAmt(j)>=0?'profit-pos':'profit-neg'}">${fmt(profitAmt(j))}</td>
+<td class="num mono">${fmtNum(profitMargin(j),1)}%</td>
+</tr>`).join('')}
+</table>
+`;
+wrapTables(v);
+}
+function wrapTables(container){
+if(!container) return;
+container.querySelectorAll('table.list').forEach(t => {
+if(t.parentElement && t.parentElement.classList.contains('table-wrap')) return;
+const w = document.createElement('div');
+w.className = 'table-wrap';
+t.parentNode.insertBefore(w, t);
+w.appendChild(t);
+});
+}
+function emptyState(title, body){
+return `<div class="empty"><b>${esc(title)}</b>${esc(body)}</div>`;
+}
+function openModal(html){
+let backdrop = document.getElementById('modalBackdrop');
+if(!backdrop){
+backdrop = document.createElement('div');
+backdrop.id = 'modalBackdrop';
+backdrop.className = 'modal-backdrop';
+document.body.appendChild(backdrop);
+backdrop.addEventListener('click', (e) => { if(e.target===backdrop) closeModal(); });
+}
+backdrop.innerHTML = `<div class="modal">${html}</div>`;
+backdrop.style.display = 'flex';
+}
+function closeModal(){
+const backdrop = document.getElementById('modalBackdrop');
+if(backdrop) backdrop.style.display = 'none';
+}
+loadAll().then(render);
+})();</script>
+</body>
+</html>
